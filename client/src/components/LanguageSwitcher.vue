@@ -1,5 +1,5 @@
 <template>
-  <div class="language-switcher">
+  <div class="language-switcher" :class="{ 'is-collapsed': effectiveCollapsed }">
     <button
       class="language-button"
       @click="toggleDropdown"
@@ -17,9 +17,11 @@
         <path d="M10 3C10 3 7.5 5.5 7.5 10C7.5 14.5 10 17 10 17" stroke="currentColor" stroke-width="1.5"/>
         <path d="M10 3C10 3 12.5 5.5 12.5 10C12.5 14.5 10 17 10 17" stroke="currentColor" stroke-width="1.5"/>
       </svg>
-      <span class="language-label">{{ localeName }}</span>
+      <!-- .label is hidden when sidebar is in collapsed/icon-only mode
+           so only the globe icon remains, preventing text overflow -->
+      <span class="language-label label">{{ localeName }}</span>
       <svg
-        class="chevron"
+        class="chevron label"
         :class="{ 'chevron-open': isDropdownOpen }"
         width="16"
         height="16"
@@ -57,8 +59,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
+import { useSidebar } from '../composables/useSidebar'
 
 const { currentLocale, setLocale, availableLocales, localeName } = useI18n()
+const { effectiveCollapsed } = useSidebar()
 
 const isDropdownOpen = ref(false)
 
@@ -91,39 +95,43 @@ const selectLanguage = (locale) => {
 <style scoped>
 .language-switcher {
   position: relative;
+  width: 100%;
 }
 
+/* Compact trigger row — full-width for the sidebar footer */
 .language-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.875rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease;
   font-family: inherit;
   font-size: 0.875rem;
-  color: #334155;
+  color: var(--text-secondary);
 }
 
 .language-button:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
+  background: var(--bg-sunken);
 }
 
 .globe-icon {
-  color: #64748b;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .language-label {
   font-weight: 500;
+  flex: 1;
+  text-align: left;
 }
 
 .chevron {
-  color: #64748b;
+  color: var(--text-muted);
   transition: transform 0.2s ease;
   flex-shrink: 0;
 }
@@ -132,15 +140,27 @@ const selectLanguage = (locale) => {
   transform: rotate(180deg);
 }
 
+/* Hide text labels when sidebar is collapsed to icon-only mode.
+   When effectiveCollapsed is true the sidebar is 72px wide and only
+   the globe icon should be visible — hiding label/chevron prevents overflow. */
+.label {
+  transition: opacity 0.15s ease;
+}
+
+.is-collapsed .label {
+  display: none;
+}
+
+/* Dropdown opens upward — component lives at the bottom of the sidebar */
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
   min-width: 160px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.1), 0 20px 40px rgba(15, 23, 42, 0.08);
   z-index: 1000;
   overflow: hidden;
 }
@@ -150,8 +170,8 @@ const selectLanguage = (locale) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: none;
   border: none;
   text-align: left;
@@ -160,16 +180,16 @@ const selectLanguage = (locale) => {
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #334155;
+  color: var(--text-secondary);
 }
 
 .dropdown-item:hover {
-  background: #f8fafc;
+  background: var(--bg-sunken);
 }
 
 .dropdown-item.active {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .language-name {
@@ -177,7 +197,7 @@ const selectLanguage = (locale) => {
 }
 
 .check-icon {
-  color: #2563eb;
+  color: var(--accent);
   flex-shrink: 0;
 }
 </style>

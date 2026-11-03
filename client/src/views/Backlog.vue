@@ -31,8 +31,8 @@
         <div class="card-header">
           <h3 class="card-title">Backlog Items</h3>
         </div>
-        <div v-if="backlogItems.length === 0" style="padding: 3rem; text-align: center;">
-          <p style="font-size: 1.125rem; color: #10b981; font-weight: 600;">
+        <div v-if="backlogItems.length === 0" class="empty-state">
+          <p class="empty-state-msg">
             ✓ No backlog items - all orders can be fulfilled!
           </p>
         </div>
@@ -63,7 +63,7 @@
                   </span>
                 </td>
                 <td>
-                  <span :style="{ color: item.days_delayed > 7 ? '#ef4444' : '#f59e0b' }">
+                  <span :class="item.days_delayed > 7 ? 'days-critical' : 'days-warning'">
                     {{ item.days_delayed }} days
                   </span>
                 </td>
@@ -150,3 +150,55 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.backlog {
+  padding: 0;
+}
+
+/* KPI grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+/* Card chrome */
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-5);
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* Empty state */
+.empty-state {
+  padding: 3rem;
+  text-align: center;
+}
+
+.empty-state-msg {
+  font-size: 1.125rem;
+  color: var(--success);
+  font-weight: 600;
+}
+
+/* Days-delayed column coloring */
+.days-critical {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.days-warning {
+  color: var(--warning);
+  font-weight: 600;
+}
+</style>
